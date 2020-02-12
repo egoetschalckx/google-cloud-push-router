@@ -25,9 +25,7 @@ public class PubSubHttpProducer {
         this.pubSubProperties = pubSubProperties;
     }
 
-
     public void publish(CloudPushMessage cloudPushMessage) {
-
         if (cloudPushMessage != null) {
             log.info(
                     "Publishing message on HTTP topic: {}\nAttributes: {}",
@@ -42,7 +40,7 @@ public class PubSubHttpProducer {
                                 cloudPushMessage.headers)
                         .get();
             } catch (InterruptedException | ExecutionException e) {
-                //log.error("Exception when publishing to HTTP queue {}", cloudPushMessage, e);
+                log.error("Exception when publishing to HTTP queue {}", cloudPushMessage, e);
                 throw new PubSubPublishingFailedException(e);
             }
         }

@@ -1,20 +1,18 @@
 spring:
+  cloud:
+    gcp:
+      project-id: egoetschalckx-test
+    pubsub:
+      emulatorHost: localhost:8085
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/cloudpush
     username: postgres
     password: admin
-  cloud:
-    gcp:
-      project-id: egoetschalckx-test
-    credentials:
-      #location=file: fff
-    pubsub:
-      emulatorHost: localhost:8085
   jpa:
     hibernate:
       ddl-auto: create
-    show-sql: true
+    #show-sql: true
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     generate-ddl: true
@@ -22,3 +20,10 @@ spring:
 logging:
   level:
     org.springframework: info
+    org:
+      springframework:
+        cloud:
+          gcp:
+            pubsub:
+              core:
+                publisher: debug

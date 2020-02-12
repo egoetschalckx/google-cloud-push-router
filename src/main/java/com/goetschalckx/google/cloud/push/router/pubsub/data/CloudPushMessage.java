@@ -7,4 +7,9 @@ public class CloudPushMessage {
     public String message;
     public Map<String, String> headers;
 
+    public CloudPushMessage(String message, Map<String, String> headers) {
+        this.message = message;
+        this.headers = headers;
+    }
+
 }

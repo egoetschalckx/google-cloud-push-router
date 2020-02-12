@@ -1,4 +1,4 @@
-package com.goetschalckx.google.cloud.push.router.subscription.data;
+package com.goetschalckx.google.cloud.push.router.subscription;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

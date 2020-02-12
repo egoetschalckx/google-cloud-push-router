@@ -1,4 +1,4 @@
-package com.goetschalckx.google.cloud.push.router.subscription.data;
+package com.goetschalckx.google.cloud.push.router.subscription;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

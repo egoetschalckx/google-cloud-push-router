@@ -9,4 +9,10 @@ public class HttpMessagePayload {
     private ImmutableList<CustomAttribute> messageCustomAttributes;
     private String payload;
 
+    public HttpMessagePayload(String topicId, ImmutableList<CustomAttribute> messageCustomAttributes, String payload) {
+        this.topicId = topicId;
+        this.messageCustomAttributes = messageCustomAttributes;
+        this.payload = payload;
+    }
+
 }

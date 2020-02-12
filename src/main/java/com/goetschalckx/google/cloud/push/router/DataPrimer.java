@@ -1,19 +1,11 @@
 package com.goetschalckx.google.cloud.push.router;
 
-import com.goetschalckx.google.cloud.push.router.pubsub.PubSubMessageGateway;
-import com.goetschalckx.google.cloud.push.router.subscription.data.Subscription;
-import com.goetschalckx.google.cloud.push.router.subscription.data.SubscriptionRepository;
+import com.github.javafaker.Faker;
+import com.goetschalckx.google.cloud.push.router.subscription.Subscription;
+import com.goetschalckx.google.cloud.push.router.subscription.SubscriptionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.MessageHandler;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -24,35 +16,19 @@ public class DataPrimer {
     @Autowired
     public DataPrimer(
             SubscriptionRepository subscriptionRepository,
-            PubSubMessageGateway pubSubMessageGateway
+            Faker faker
     ) {
-        pubSubMessageGateway.sendToPubsub("foobar");
-        pubSubMessageGateway.sendToPubsub("foobar");
-        pubSubMessageGateway.sendToPubsub("foobar");
-        pubSubMessageGateway.sendToPubsub("foobar");
-        pubSubMessageGateway.sendToPubsub("foobar");
+        for (int i = 0; i < 250; i++) {
+            String topic = faker.options().option(Topic.class).name();
 
-        /*
-        List<List<String>> records = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader("subs.csv"))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] values = line.split(COMMA_DELIMITER);
-                records.add(Arrays.asList(values));
+            Subscription sub = new Subscription();
+            sub.subscriptionId = UUID.randomUUID();
+            sub.topic = topic;
+            sub.type = "http";
+            sub.headerJson = "{'x-foo':'bar'}";
 
-                Subscription sub = new Subscription();
-
-                UUID id = UUID.fromString(values[0]);
-
-                sub.subscriptionId = id;
-
-                subscriptionRepository.save(sub);
-            }
-
-            int temp = 42;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
+            subscriptionRepository.save(sub);
+        }
     }
 
 }

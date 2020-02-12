@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.support.GenericMessage;
 import org.springframework.retry.RetryCallback;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Component;
@@ -33,9 +34,11 @@ public class PubSubIngestConsumer {
         this.retryTemplate = retryTemplate;
     }
 
-    @ServiceActivator(inputChannel = "ingestMessageChannel")
+    @ServiceActivator(inputChannel = "cloudPushChannel")
     public void receive(Message<String> message) {
-        log.info("Got message on ingest topic: {}\nHeaders {}", message.getPayload(), message.getHeaders());
+        // ?? ynowork
+        //log.info("Got message on ingest topic: {} \nHeaders {}", message.getPayload(), message.getHeaders());
+        log.info("got message on cloudPushChannel..");
 
         List<CloudPushMessage> messagesToPublish = fanOutService.fanOut(message);
 
@@ -51,7 +54,7 @@ public class PubSubIngestConsumer {
                                 return null;
                             }));
         } else {
-            log.info("No subscribers matching message {}", message);
+            //log.info("No subscribers matching message {}", message);
         }
     }
 

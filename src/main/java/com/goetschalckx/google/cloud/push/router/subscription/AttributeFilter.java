@@ -1,4 +1,4 @@
-package com.goetschalckx.google.cloud.push.router.subscription.data;
+package com.goetschalckx.google.cloud.push.router.subscription;
 
 import java.io.Serializable;
 import java.util.UUID;

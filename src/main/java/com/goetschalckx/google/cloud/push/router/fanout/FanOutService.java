@@ -1,15 +1,17 @@
 package com.goetschalckx.google.cloud.push.router.fanout;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.goetschalckx.google.cloud.push.router.config.MapStringStringType;
 import com.goetschalckx.google.cloud.push.router.pubsub.data.CloudPushMessage;
 import com.goetschalckx.google.cloud.push.router.pubsub.data.CustomAttribute;
 import com.goetschalckx.google.cloud.push.router.pubsub.data.ReservedAttributes;
-import com.goetschalckx.google.cloud.push.router.subscription.SubscriptionService;
-import com.goetschalckx.google.cloud.push.router.subscription.data.Subscription;
+import com.goetschalckx.google.cloud.push.router.subscription.Subscription;
+import com.goetschalckx.google.cloud.push.router.subscription.SubscriptionRepository;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -21,11 +23,11 @@ public class FanOutService {
     final static Logger log = LoggerFactory.getLogger(FanOutService.class);
 
     private ObjectMapper objectMapper;
-    private SubscriptionService subscriptionService;
+    private SubscriptionRepository subscriptionRepository;
 
-    public FanOutService(ObjectMapper objectMapper, SubscriptionService subscriptionService) {
+    public FanOutService(ObjectMapper objectMapper, SubscriptionRepository subscriptionRepository) {
         this.objectMapper = objectMapper;
-        this.subscriptionService = subscriptionService;
+        this.subscriptionRepository = subscriptionRepository;
     }
 
     private static ImmutableMap<String, String> defaultHeaders() {
@@ -38,7 +40,8 @@ public class FanOutService {
     }
 
     private static ImmutableList<CustomAttribute> constructCustomAttributeList(
-            Map<String, String> messageAttributes) {
+            Map<String, String> messageAttributes
+    ) {
         ImmutableList.Builder<CustomAttribute> listBuilder = ImmutableList.builder();
 
         messageAttributes.forEach(
@@ -51,17 +54,15 @@ public class FanOutService {
         return listBuilder.build();
     }
 
-    public List<CloudPushMessage> fanOut(Object message) {
+    public List<CloudPushMessage> fanOut(Message<String> message) {
         Map<String, String> messageAttributes = new HashMap<>();
-        /*message
+        message
                 .getHeaders()
                 .forEach((key, value) -> messageAttributes.put(key, value.toString()));
 
         String messageBody = message
                 .getPayload()
-                .toString();*/
-
-        String messageBody = "";
+                .toString();
 
         String correlationId = UUID.randomUUID().toString();
 
@@ -73,7 +74,7 @@ public class FanOutService {
 
         // get matching subscriptions
         List<Subscription> subscriptions =
-                subscriptionService.getSubscriptions(topicId, messageAttributes);
+                subscriptionRepository.findAll();//(topicId, messageAttributes);
 
         ImmutableList<CustomAttribute> customCustomAttributeDataList =
                     constructCustomAttributeList(messageAttributes);
@@ -100,26 +101,26 @@ public class FanOutService {
         for (Subscription subscription : subscriptions) {
 
             Map<String, String> outboundHeaders = new HashMap<>(sharedHeaders);
-            outboundHeaders.put("url", null /*subscription.getUrl()*/);
+            outboundHeaders.put("url", subscription.url);
 
             try {
-                Map<String, String> customHeaders = null
-                        /*objectMapper.readValue(
-                                subscription.getHeaderJson(),
-                                new MapStringStringType()*/;
+                Map<String, String> customHeaders = new HashMap<>();
+                        objectMapper.readValue(
+                                subscription.headerJson,
+                                new MapStringStringType());
 
                 customHeaders.forEach(outboundHeaders::putIfAbsent);
 
                 HttpMessagePayload httpMessagePayload = null;
-                        //new HttpMessagePayload(topicId, messageCustomAttributes, messageBody);
+                        new HttpMessagePayload(topicId, messageCustomAttributes, messageBody);
 
                 String payload = objectMapper.writeValueAsString(httpMessagePayload);
 
-                CloudPushMessage messages = null; //new CloudPushMessage(payload, outboundHeaders);
+                CloudPushMessage messages = new CloudPushMessage(payload, outboundHeaders);
 
                 pubSubPayloads.add(messages);
             } catch (IOException e) {
-                //log.error("IOException during processing for subscription: {}\nError: {}", subscription, e);
+                log.error("IOException during processing for subscription: {}\nError: {}", subscription, e);
             }
         }
 
