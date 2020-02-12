@@ -12,8 +12,8 @@ import java.util.concurrent.ExecutionException;
 @AllArgsConstructor
 public class PubSubHttpProducer {
 
-    private final PubSubOperations pubSubOperations;
-    private final PubSubProperties pubSubProperties;
+    private PubSubOperations pubSubOperations;
+    private PubSubProperties pubSubProperties;
 
     public void publish(CloudPushMessage cloudPushMessage) {
 

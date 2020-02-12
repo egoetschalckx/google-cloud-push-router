@@ -1,6 +1,6 @@
 package com.goetschalckx.google.cloud.push.router.fanout;
 
-import com.goetschalckx.google.cloud.push.router.pubsub.data.Attribute;
+import com.goetschalckx.google.cloud.push.router.pubsub.data.CustomAttribute;
 import com.google.common.collect.ImmutableList;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,7 +10,7 @@ import lombok.Data;
 public class HttpMessagePayload {
 
     private String topicId;
-    private ImmutableList<Attribute> messageAttributes;
+    private ImmutableList<CustomAttribute> messageCustomAttributes;
     private String payload;
 
 }

@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class Attribute {
+public class CustomAttribute {
 
     private String key;
 

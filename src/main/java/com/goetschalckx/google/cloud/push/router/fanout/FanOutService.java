@@ -1,16 +1,9 @@
 package com.goetschalckx.google.cloud.push.router.fanout;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.goetschalckx.google.cloud.push.router.config.MapStringStringType;
-import com.goetschalckx.google.cloud.push.router.pubsub.data.Attribute;
 import com.goetschalckx.google.cloud.push.router.pubsub.data.CloudPushMessage;
+import com.goetschalckx.google.cloud.push.router.pubsub.data.CustomAttribute;
 import com.goetschalckx.google.cloud.push.router.pubsub.data.ReservedAttributes;
 import com.goetschalckx.google.cloud.push.router.subscription.SubscriptionService;
 import com.goetschalckx.google.cloud.push.router.subscription.data.Subscription;
@@ -20,12 +13,15 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
 
+import java.io.IOException;
+import java.util.*;
+
 @Slf4j
 @AllArgsConstructor
 public class FanOutService {
 
-    private final ObjectMapper objectMapper;
-    private final SubscriptionService subscriptionService;
+    private ObjectMapper objectMapper;
+    private SubscriptionService subscriptionService;
 
     private static ImmutableMap<String, String> defaultHeaders() {
         ImmutableMap.Builder<String, String> mapBuilder = ImmutableMap.builder();
@@ -36,11 +32,15 @@ public class FanOutService {
         return mapBuilder.build();
     }
 
-    private static ImmutableList<Attribute> constructCustomAttributeList(
+    private static ImmutableList<CustomAttribute> constructCustomAttributeList(
             Map<String, String> messageAttributes) {
-        ImmutableList.Builder<Attribute> listBuilder = ImmutableList.builder();
+        ImmutableList.Builder<CustomAttribute> listBuilder = ImmutableList.builder();
 
-        messageAttributes.forEach((key, value) -> listBuilder.add(new Attribute(key, value)));
+        messageAttributes.forEach((key, value) -> {
+            CustomAttribute element = new CustomAttribute(key, value);
+
+            listBuilder.add(element);
+        });
 
         return listBuilder.build();
     }
@@ -67,7 +67,7 @@ public class FanOutService {
         List<Subscription> subscriptions =
                 subscriptionService.getSubscriptions(topicId, messageAttributes);
 
-        ImmutableList<Attribute> customAttributeDataList =
+        ImmutableList<CustomAttribute> customCustomAttributeDataList =
                     constructCustomAttributeList(messageAttributes);
 
         List<CloudPushMessage> messages =
@@ -75,7 +75,7 @@ public class FanOutService {
                             messageBody,
                             topicId,
                             subscriptions,
-                            customAttributeDataList,
+                            customCustomAttributeDataList,
                             defaultHeaders());
 
         return messages;
@@ -85,7 +85,7 @@ public class FanOutService {
             String messageBody,
             String topicId,
             List<Subscription> subscriptions,
-            ImmutableList<Attribute> messageAttributes,
+            ImmutableList<CustomAttribute> messageCustomAttributes,
             ImmutableMap<String, String> sharedHeaders
     ) {
         List<CloudPushMessage> pubSubPayloads = new ArrayList<>(subscriptions.size());
@@ -102,7 +102,7 @@ public class FanOutService {
 
                 customHeaders.forEach(outboundHeaders::putIfAbsent);
 
-                HttpMessagePayload httpMessagePayload = new HttpMessagePayload(topicId, messageAttributes, messageBody);
+                HttpMessagePayload httpMessagePayload = new HttpMessagePayload(topicId, messageCustomAttributes, messageBody);
 
                 String payload = objectMapper.writeValueAsString(httpMessagePayload);
 

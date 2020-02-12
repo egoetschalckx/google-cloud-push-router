@@ -15,7 +15,7 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Subscription implements Serializable {
+public class Subscription {
 
     private static final long serialVersionUID = 1L;
 
