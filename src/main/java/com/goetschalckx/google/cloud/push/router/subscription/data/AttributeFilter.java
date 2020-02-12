@@ -5,25 +5,16 @@ import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 @Entity
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class AttributeFilter {
 
     public static final long serialVersionUID = 1L;
 
     @Id
-    private UUID attributeId;
+    public UUID attributeId;
 
-    private UUID subscriptionId;
-
-    private String key;
-
-    private String value;
+    public UUID subscriptionId;
+    public String key;
+    public String value;
 
 }

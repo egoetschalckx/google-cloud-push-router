@@ -1,37 +1,48 @@
 package com.goetschalckx.google.cloud.push.router.pubsub;
 
+import com.goetschalckx.google.cloud.push.router.pubsub.config.PubSubProperties;
 import com.goetschalckx.google.cloud.push.router.pubsub.data.CloudPushMessage;
 import com.goetschalckx.google.cloud.push.router.pubsub.data.PubSubPublishingFailedException;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gcp.pubsub.core.PubSubOperations;
+import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ExecutionException;
 
-@Slf4j
-@AllArgsConstructor
+@Service
 public class PubSubHttpProducer {
 
-    private PubSubOperations pubSubOperations;
-    private PubSubProperties pubSubProperties;
+    final static Logger log = LoggerFactory.getLogger(PubSubHttpProducer.class);
+
+    private final PubSubOperations pubSubOperations;
+    private final PubSubProperties pubSubProperties;
+
+    @Autowired
+    public PubSubHttpProducer(PubSubOperations pubSubOperations, PubSubProperties pubSubProperties) {
+        this.pubSubOperations = pubSubOperations;
+        this.pubSubProperties = pubSubProperties;
+    }
+
 
     public void publish(CloudPushMessage cloudPushMessage) {
 
         if (cloudPushMessage != null) {
             log.info(
                     "Publishing message on HTTP topic: {}\nAttributes: {}",
-                    cloudPushMessage.getMessage(),
-                    cloudPushMessage.getHeaders());
+                    cloudPushMessage.message,
+                    cloudPushMessage.headers);
 
             try {
                 pubSubOperations
                         .publish(
-                                pubSubProperties.getHttpMessageTopic(),
-                                cloudPushMessage.getMessage(),
-                                cloudPushMessage.getHeaders())
+                                pubSubProperties.httpMessageTopic,
+                                cloudPushMessage.message,
+                                cloudPushMessage.headers)
                         .get();
             } catch (InterruptedException | ExecutionException e) {
-                log.error("Exception when publishing to HTTP queue {}", cloudPushMessage, e);
+                //log.error("Exception when publishing to HTTP queue {}", cloudPushMessage, e);
                 throw new PubSubPublishingFailedException(e);
             }
         }

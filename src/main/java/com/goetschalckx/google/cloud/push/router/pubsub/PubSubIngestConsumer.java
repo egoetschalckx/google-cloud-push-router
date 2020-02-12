@@ -2,22 +2,36 @@ package com.goetschalckx.google.cloud.push.router.pubsub;
 
 import com.goetschalckx.google.cloud.push.router.fanout.FanOutService;
 import com.goetschalckx.google.cloud.push.router.pubsub.data.CloudPushMessage;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.Message;
 import org.springframework.retry.RetryCallback;
 import org.springframework.retry.support.RetryTemplate;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Slf4j
-@AllArgsConstructor
+@Component
 public class PubSubIngestConsumer {
+
+    final static Logger log = LoggerFactory.getLogger(PubSubIngestConsumer.class);
 
     private final FanOutService fanOutService;
     private final PubSubHttpProducer pubSubHttpProducer;
     private final RetryTemplate retryTemplate;
+
+    @Autowired
+    public PubSubIngestConsumer(
+            FanOutService fanOutService,
+            PubSubHttpProducer pubSubHttpProducer,
+            RetryTemplate retryTemplate
+    ) {
+        this.fanOutService = fanOutService;
+        this.pubSubHttpProducer = pubSubHttpProducer;
+        this.retryTemplate = retryTemplate;
+    }
 
     @ServiceActivator(inputChannel = "ingestMessageChannel")
     public void receive(Message<String> message) {
@@ -33,7 +47,7 @@ public class PubSubIngestConsumer {
                                 pubSubHttpProducer.publish(pubSubPayload);
                                 return null;
                             }, e -> {
-                                log.error("Exhausted retries attempting to publish message {} {}", pubSubPayload, e);
+                                //log.error("Exhausted retries attempting to publish message {} {}", pubSubPayload, e);
                                 return null;
                             }));
         } else {
