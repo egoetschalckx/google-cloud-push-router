@@ -41,17 +41,15 @@ public class PubSubConfig {
         // why, eric? why?
         adapter.setAckMode(AckMode.AUTO_ACK);
 
+        //String pubsubEmulatorHost = System.getenv("PUBSUB_EMULATOR_HOST");
+        //String pubsubProjectId = System.getenv("PUBSUB_PROJECT_ID");
+
         return adapter;
     }
 
     @Bean
     public MessageChannel cloudPushChannel() {
         return new DirectChannel();
-    }
-
-    @MessagingGateway(defaultRequestChannel = "pubsubOutputChannel")
-    public interface PubsubOutboundGateway {
-        void sendToPubsub(String text);
     }
 
 }

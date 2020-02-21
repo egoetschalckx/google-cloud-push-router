@@ -19,7 +19,7 @@ dependencies {
 	//implementation 'org.springframework.boot:spring-boot-starter-json'
 	implementation 'org.springframework.boot:spring-boot-configuration-processor'
 	//implementation 'org.springframework.boot:spring-boot-starter-logging'
-	implementation 'org.springframework.boot:spring-boot-starter-cache'
+	//implementation 'org.springframework.boot:spring-boot-starter-cache'
 
 	implementation 'org.springframework.cloud:spring-cloud-gcp-starter-pubsub:1.2.1.RELEASE'
 
@@ -28,6 +28,7 @@ dependencies {
 	implementation 'org.postgresql:postgresql:42.2.10'
 
 	implementation 'com.github.javafaker:javafaker:1.0.2'
+	implementation 'org.yaml:snakeyaml:1.23'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }

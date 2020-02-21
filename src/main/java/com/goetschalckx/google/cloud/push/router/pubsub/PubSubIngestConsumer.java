@@ -50,11 +50,12 @@ public class PubSubIngestConsumer {
                                 pubSubHttpProducer.publish(pubSubPayload);
                                 return null;
                             }, e -> {
-                                //log.error("Exhausted retries attempting to publish message {} {}", pubSubPayload, e);
+                                String msg = "Exhausted retries attempting to publish message " + message;
+                                log.error(msg, e);
                                 return null;
                             }));
         } else {
-            //log.info("No subscribers matching message {}", message);
+            log.info("No subscribers matching message {}", message);
         }
     }
 

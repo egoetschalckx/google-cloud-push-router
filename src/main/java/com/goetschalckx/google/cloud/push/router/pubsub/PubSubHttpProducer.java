@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gcp.pubsub.core.PubSubOperations;
+import org.springframework.cloud.gcp.pubsub.core.PubSubTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ExecutionException;
@@ -27,24 +28,23 @@ public class PubSubHttpProducer {
 
     public void publish(CloudPushMessage cloudPushMessage) {
         if (cloudPushMessage != null) {
-            log.info(
+            log.debug(
                     "Publishing message on HTTP topic: {}\nAttributes: {}",
-                    cloudPushMessage.message,
-                    cloudPushMessage.headers);
+                    pubSubProperties.httpMessageTopic,
+                    cloudPushMessage.getHeaders());
 
             try {
                 pubSubOperations
                         .publish(
                                 pubSubProperties.httpMessageTopic,
-                                cloudPushMessage.message,
-                                cloudPushMessage.headers)
+                                cloudPushMessage.getMessage(),
+                                cloudPushMessage.getHeaders())
                         .get();
             } catch (InterruptedException | ExecutionException e) {
-                log.error("Exception when publishing to HTTP queue {}", cloudPushMessage, e);
+                log.error("Unhandled exception during publish() to HTTP topic", e);
                 throw new PubSubPublishingFailedException(e);
             }
         }
-
     }
 
 }
